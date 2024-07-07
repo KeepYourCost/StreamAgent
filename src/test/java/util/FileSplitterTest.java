@@ -8,13 +8,12 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class FileChunkerTest {
-    final FileChunker fileChunker = FileChunker.getInstance();
+class FileSplitterTest {
+    final FileSplitter fileSplitter = FileSplitter.getInstance();
 
     @Test
     @DisplayName("파일분할_텍스트")
@@ -24,15 +23,15 @@ class FileChunkerTest {
         Path path = Paths.get(classLoader.getResource("sample/sampleText.txt").toURI());
 
         byte[] fileContent = Files.readAllBytes(path);
-        int expectedChunkCount = (fileContent.length + FileChunker.CHUNK_SIZE - 1) / FileChunker.CHUNK_SIZE;
+        int expectedChunkCount = (fileContent.length + FileSplitter.CHUNK_SIZE - 1) / FileSplitter.CHUNK_SIZE;
 
         // When
-        List<byte[]> chunks = fileChunker.splitFileIntoChunks(path.toString());
+        FileBuffer fileBuffer = fileSplitter.splitFile(path.toString());
 
         // Then
         // 분할된 Chunk 개수로 비교
-        assertNotNull(chunks);
-        assertEquals(expectedChunkCount, chunks.size());
+        assertNotNull(fileBuffer.getChunks());
+        assertEquals(expectedChunkCount, fileBuffer.getChunkCount());
     }
 
     @Test
@@ -43,14 +42,14 @@ class FileChunkerTest {
         Path path = Paths.get(classLoader.getResource("sample/sampleImg.png").toURI());
 
         byte[] fileContent = Files.readAllBytes(path);
-        int expectedChunkCount = (fileContent.length + FileChunker.CHUNK_SIZE - 1) / FileChunker.CHUNK_SIZE;
+        int expectedChunkCount = (fileContent.length + FileSplitter.CHUNK_SIZE - 1) / FileSplitter.CHUNK_SIZE;
 
         // When
-        List<byte[]> chunks = fileChunker.splitFileIntoChunks(path.toString());
+        FileBuffer fileBuffer = fileSplitter.splitFile(path.toString());
 
         // Then
-        assertNotNull(chunks);
-        assertEquals(expectedChunkCount, chunks.size());
+        assertNotNull(fileBuffer.getChunks());
+        assertEquals(expectedChunkCount, fileBuffer.getChunkCount());
     }
 
     @Test
@@ -61,13 +60,13 @@ class FileChunkerTest {
         Path path = Paths.get(classLoader.getResource("sample/mysql-connector-j-8.4.0.jar").toURI());
 
         byte[] fileContent = Files.readAllBytes(path);
-        int expectedChunkCount = (fileContent.length + FileChunker.CHUNK_SIZE - 1) / FileChunker.CHUNK_SIZE;
+        int expectedChunkCount = (fileContent.length + FileSplitter.CHUNK_SIZE - 1) / FileSplitter.CHUNK_SIZE;
 
         // When
-        List<byte[]> chunks = fileChunker.splitFileIntoChunks(path.toString());
+        FileBuffer fileBuffer = fileSplitter.splitFile(path.toString());
 
         // Then
-        assertNotNull(chunks);
-        assertEquals(expectedChunkCount, chunks.size());
+        assertNotNull(fileBuffer.getChunks());
+        assertEquals(expectedChunkCount, fileBuffer.getChunkCount());
     }
 }
