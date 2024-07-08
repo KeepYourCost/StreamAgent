@@ -1,6 +1,6 @@
 package clients.producer;
 
-import config.ProducerConfig;
+import config.KafkaConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -27,7 +27,7 @@ public class DataProducer {
         List<byte[]> dataStreams = fileSplitter.splitFile(filePath).getChunks();
         LOGGER.info("데이터 분할 완료. Path = {}", filePath);
 
-        try (final Producer<String, byte[]> producer = new KafkaProducer<>(ProducerConfig.getInstance())) {
+        try (final Producer<String, byte[]> producer = new KafkaProducer<>(KafkaConfig.getProducerProperties())) {
             for (int i = 0; i < dataStreams.size(); i++) {
                 final String key = String.format(KEY_FORMAT, filePath, i);
                 producer.send(
