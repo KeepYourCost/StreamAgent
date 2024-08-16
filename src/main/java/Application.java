@@ -1,3 +1,4 @@
+import clients.consumer.FileDataConsumer;
 import clients.producer.DataProducer;
 import util.FileSplitter;
 
@@ -8,11 +9,15 @@ public class Application {
         DataProducer dataProducer = new DataProducer(
                 FileSplitter.getInstance()
         );
+        FileDataConsumer consumer = new FileDataConsumer();
 
         try {
-            dataProducer.sendDataStreams("C:/CODE/oss/kyc/kyc-agent/src/main/resources/sample/SampleImg.png");
+//        consumer.consumeFileDataStream();
+            dataProducer.produceFileDataStream("D:\\StreamAgent\\src\\main\\resources\\sample\\SampleImg.png");
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+
+
     }
 }
