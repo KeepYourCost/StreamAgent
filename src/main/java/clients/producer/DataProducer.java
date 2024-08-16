@@ -16,7 +16,6 @@ import java.util.List;
 public class DataProducer {
     private final FileSplitter fileSplitter;
     private static String CURRENT_SPOT_ID = "YTA0YjkwYWEzZDY0MTFlZj";
-    private static final String KEY_FORMAT = "%s::%d";
     private static final Logger LOGGER = LoggerFactory.getLogger(DataProducer.class);
 
     public DataProducer(FileSplitter fileSplitter) {
@@ -34,7 +33,6 @@ public class DataProducer {
 
             for (int i = 0; i < dataStreams.size(); i++) {
                 final String key = KeyManager.generateKey(filePath, i);
-                LOGGER.info("Produced event to topic '{}': key = {}", CURRENT_SPOT_ID, key);
                 producer.send(
                         new ProducerRecord<>(
                                 CURRENT_SPOT_ID,

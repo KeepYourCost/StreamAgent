@@ -11,12 +11,14 @@ public class Application {
         );
         FileDataConsumer consumer = new FileDataConsumer();
 
-        try {
-//        consumer.consumeFileDataStream();
-            dataProducer.produceFileDataStream("D:\\StreamAgent\\src\\main\\resources\\sample\\SampleImg.png");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        consumer.consumeFileDataStream();
+//        try {
+//            String filePath = "D:\\StreamAgent\\src\\main\\resources\\sample\\SampleImg.png";
+//            dataProducer.produceFileDataStream(filePath);
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//        }
+//"D:\\StreamAgent\\src\\main\\resources\\sample\\snowy-mountain-peak-starry-galaxy-majesty-generative-ai.jpg"
 
 
     }
