@@ -1,10 +1,16 @@
-import infrastructure.singleton.SingletonScanner;
-import spot.controller.SpotController;
+import infrastructure.singleton.SingletonRegistry;
 import infrastructure.singleton.SingletonFactory;
+import infrastructure.singleton.SingletonScanner;
 import io.javalin.Javalin;
 
 public class Application {
     public static void main(String[] args) {
+        Javalin app = Javalin.create().start(8080);
+        SingletonRegistry.registerInstanceAsSingleton(Javalin.class, app);
+
+        SingletonScanner.scanSingletonsFromRoot();
+
+
 //        FileDataProducer fileDataProducer = new FileDataProducer(
 //                FileSplitter.getInstance()
 //        );
@@ -20,10 +26,6 @@ public class Application {
 //"D:\\StreamAgent\\src\\main\\resources\\sample\\snowy-mountain-peak-starry-galaxy-majesty-generative-ai.jpg"
 
 
-        Javalin app = Javalin.create().start(8080);
-        SingletonScanner.registerInstanceAsSingleton(Javalin.class, app);
-
-        SingletonScanner.scanSingletonsFromRoot();
 
 
 //        SpotController spotController = SingletonFactory.getInstance(SpotController.class);

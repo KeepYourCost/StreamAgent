@@ -1,7 +1,5 @@
 package infrastructure.singleton;
 
-import java.util.Map;
-
 public class SingletonFactory {
 
     @SuppressWarnings("unchecked")
@@ -12,7 +10,7 @@ public class SingletonFactory {
         }
 
         // 인스턴스가 없으면 등록
-        SingletonScanner.registerSingleton(clazz, InjectionStrategy.AUTO_INJECTED);
+        SingletonRegistry.registerSingleton(clazz, InjectionStrategy.AUTO_INJECTED);
 
         // 등록된 인스턴스를 반환
         if (SingletonContainer.containsKey(clazz)) {
