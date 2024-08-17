@@ -3,18 +3,23 @@ package infrastructure.singleton;
 import java.util.Map;
 
 public class SingletonFactory {
-    private static final Map<Class<?>, Object> instances = SingletonContainer.instances;
 
     @SuppressWarnings("unchecked")
     public static <T> T getInstance(Class<T> clazz) {
-        if (instances.containsKey(clazz)) {
-            return (T) instances.get(clazz);
+        SingletonKey key = new SingletonKey(clazz, null);
+        if (SingletonContainer.containsKey(clazz)) {
+            return (T) SingletonContainer.get(clazz);
         }
 
         // 인스턴스가 없으면 등록
-        SingletonScanner.registerSingleton(clazz);
+        SingletonScanner.registerSingleton(clazz, InjectionStrategy.AUTO_INJECTED);
 
         // 등록된 인스턴스를 반환
-        return (T) instances.get(clazz);
+        if (SingletonContainer.containsKey(clazz)) {
+            return (T) SingletonContainer.get(clazz);
+        }
+
+        // 생성에 실패한 경우 예외
+        throw new IllegalStateException("Failed to create or retrieve singleton instance for class: " + clazz.getName());
     }
 }

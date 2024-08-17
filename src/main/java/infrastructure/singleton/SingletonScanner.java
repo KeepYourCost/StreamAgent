@@ -3,13 +3,14 @@ package infrastructure.singleton;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ConfigurationBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
-import java.util.Map;
 import java.util.Set;
 
 public class SingletonScanner {
-    private static final Map<Class<?>, Object> container = SingletonContainer.instances;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SingletonScanner.class);
 
     /**
      * 싱글톤 객체 등록
@@ -21,7 +22,7 @@ public class SingletonScanner {
             // Root 패키지는 ""으로 사용
             scanSingletonsInPackage("");
         } catch (Exception ex) {
-            System.err.println(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
 
@@ -38,13 +39,20 @@ public class SingletonScanner {
         for (Class<?> clazz : singletonClasses) {
             // 각 클래스를 컨테이너에 등록
             try {
-                registerSingleton(clazz);
+                registerSingleton(clazz, InjectionStrategy.AUTO_INJECTED);
             } catch (IllegalStateException ex) {
                 if (ex.getMessage().startsWith("Is already registered")) {
-                    System.err.println(ex.getMessage());
+                    LOGGER.warn(ex.getMessage());
+                    return;
                 }
+                LOGGER.error(ex.getMessage());
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> void registerSingletonToContainer(Class<T> clazz) {
+        registerSingleton(clazz, InjectionStrategy.MANUAL_INJECTED);
     }
 
     /**
@@ -52,20 +60,31 @@ public class SingletonScanner {
      * 인자로 전달되는 클래스 타입 객체를 싱글톤 컨테이너 등록한다.
      * 이미 등록되어 있는 객체를 등록하려 하는 경우, 아무 동작도 하지 않는다.
      *
-     * @param clazz 클래스 타입
-     * @throws IllegalStateException 이미 등록되어 있는 클래스를 재등록하려는 경우
-     * @throws IllegalStateException 등록하려는 클래스에 {@link Singleton}어노테이션이 없는 경우
+     * @param clazz   클래스 타입
+     * @param strategy
+     * @throws IllegalStateException    이미 등록되어 있는 클래스를 재등록하려는 경우
+     * @throws IllegalStateException    등록하려는 클래스에 {@link Singleton}어노테이션이 없는 경우
      * @throws IllegalArgumentException 등록하려는 클래스에 {@link Injection }어노테이션 또는 '기본 생성자'가 없는 경우
      */
     @SuppressWarnings("unchecked")
-    public static <T> void registerSingleton(Class<T> clazz) {
-        if (container.containsKey(clazz)) {
-            throw new IllegalStateException("Is already registered as a singleton. Class: " + clazz.getName());
+    protected static <T> void registerSingleton(Class<T> clazz, InjectionStrategy strategy) {
+        SingletonKey newKey = new SingletonKey(clazz, strategy);
+        SingletonKey existingKey = SingletonContainer.findExistingKey(clazz);
+
+        if (existingKey != null) {
+            if (existingKey.injectionStrategy == InjectionStrategy.MANUAL_INJECTED) {
+                throw new IllegalStateException("Is already registered as a singleton. Class: " + clazz.getName());
+            }
+            return;
         }
 
         synchronized (clazz) { // 멀티스레드시 동기화 처리
-            if (container.containsKey(clazz)) {
-                throw new IllegalStateException("Is already registered as a singleton. Class: " + clazz.getName());
+            existingKey = SingletonContainer.findExistingKey(clazz);
+            if (existingKey != null) {
+                if (existingKey.injectionStrategy == InjectionStrategy.MANUAL_INJECTED) {
+                    throw new IllegalStateException("Is already registered as a singleton. Class: " + clazz.getName());
+                }
+                return;
             }
 
             try {
@@ -88,9 +107,9 @@ public class SingletonScanner {
                 Object[] parameters = createInjectionParameters(injectionConstructor);
                 T instance = injectionConstructor.newInstance(parameters);
 
-                container.put(clazz, instance); // 인스턴스 저장
+                SingletonContainer.put(newKey, instance); // 인스턴스 저장
             } catch (Exception ex) {
-                System.err.println(ex.getMessage());
+                LOGGER.error(ex.getMessage());
                 throw new RuntimeException("Failed to create singleton instance", ex);
             }
 
@@ -106,15 +125,16 @@ public class SingletonScanner {
      * @throws IllegalStateException 이미 등록되어 있는 클래스를 재등록하려는 경우
      */
     public static <T> void registerInstanceAsSingleton(Class<T> clazz, T instance) {
-        if (container.containsKey(clazz)) {
+        SingletonKey key = new SingletonKey(clazz, InjectionStrategy.MANUAL_INJECTED);
+        if (SingletonContainer.containsKey(clazz)) {
             throw new IllegalStateException("Is already registered as a singleton. Class: " + clazz.getName());
         }
 
         synchronized (clazz) {
-            if (container.containsKey(clazz)) {
+            if (SingletonContainer.containsKey(clazz)) {
                 throw new IllegalStateException("Is already registered as a singleton. Class: " + clazz.getName());
             }
-            container.put(clazz, instance);
+            SingletonContainer.put(key, instance);
         }
     }
 
