@@ -71,6 +71,27 @@ public class SingletonScanner {
         }
     }
 
+    /**
+     * 외부에서 생성된 객체를 싱글톤 컨테이너에 등록한다.
+     * 이미 해당 클래스 타입으로 등록된 싱글톤 객체가 있을 경우, 예외가 발생한다.
+     *
+     * @param clazz 클래스 타입
+     * @param instance 해당 클래스 타입의 인스턴스
+     * @throws IllegalStateException 이미 존재하는 클래스 등록하려 할 경우 발생
+     */
+    public static <T> void registerInstanceAsSingleton(Class<T> clazz, T instance) {
+        if (container.containsKey(clazz)) {
+            throw new IllegalStateException("Is already registered as a singleton. Class: " + clazz.getName());
+        }
+
+        synchronized (clazz) {
+            if (container.containsKey(clazz)) {
+                throw new IllegalStateException("Is already registered as a singleton. Class: " + clazz.getName());
+            }
+            container.put(clazz, instance);
+        }
+    }
+
     private static <T> Constructor<T> findConstructorWithInjection(Constructor<?>[] constructors) {
         Constructor<T> defaultConstructor = null;
         for (Constructor<?> constructor : constructors) {
