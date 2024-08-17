@@ -2,18 +2,18 @@ package spot.controller;
 
 import core.clients.consumer.FileDataConsumer;
 import core.clients.consumer.FileInfo;
-import core.clients.producer.DataProducer;
+import core.clients.producer.FileDataProducer;
 import core.util.FileCombiner;
 
 import java.util.IllegalFormatFlagsException;
 
 public class StreamController {
     private final FileDataConsumer consumer;
-    public final DataProducer producer;
+    public final FileDataProducer producer;
     private final FileCombiner fileCombiner;
     public StreamController (
             FileDataConsumer consumer,
-            DataProducer producer,
+            FileDataProducer producer,
             FileCombiner fileCombiner
     ) {
         this.consumer = consumer;

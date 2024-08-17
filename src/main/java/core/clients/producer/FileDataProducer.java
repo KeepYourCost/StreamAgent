@@ -13,12 +13,12 @@ import core.util.KeyManager;
 import java.io.IOException;
 import java.util.List;
 
-public class DataProducer {
+public class FileDataProducer {
     private final FileSplitter fileSplitter;
     private static String CURRENT_SPOT_ID = "YTA0YjkwYWEzZDY0MTFlZj";
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataProducer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileDataProducer.class);
 
-    public DataProducer(FileSplitter fileSplitter) {
+    public FileDataProducer(FileSplitter fileSplitter) {
         this.fileSplitter = fileSplitter;
     }
 
