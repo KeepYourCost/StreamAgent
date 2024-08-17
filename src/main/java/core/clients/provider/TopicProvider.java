@@ -1,6 +1,6 @@
 package core.clients.provider;
 
-import infrastructure.factory.Singleton;
+import infrastructure.singleton.Singleton;
 
 @Singleton
 public class TopicProvider {

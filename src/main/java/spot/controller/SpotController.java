@@ -1,7 +1,7 @@
 package spot.controller;
 
 import common.vo.Message;
-import infrastructure.factory.Singleton;
+import infrastructure.singleton.Singleton;
 import io.javalin.Javalin;
 import spot.controller.vo.ReqRegisterSpotId;
 import spot.service.SpotService;

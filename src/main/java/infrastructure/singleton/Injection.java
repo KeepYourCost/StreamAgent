@@ -1,4 +1,4 @@
-package infrastructure.factory;
+package infrastructure.singleton;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,11 +1,6 @@
-import core.clients.provider.TopicProvider;
-import core.clients.consumer.FileDataConsumer;
-import core.clients.producer.FileDataProducer;
 import spot.controller.SpotController;
-import infrastructure.factory.SingletonFactory;
+import infrastructure.singleton.SingletonFactory;
 import io.javalin.Javalin;
-import spot.service.SpotService;
-import core.util.FileSplitter;
 
 public class Application {
     public static void main(String[] args) {
@@ -24,14 +19,8 @@ public class Application {
 //"D:\\StreamAgent\\src\\main\\resources\\sample\\snowy-mountain-peak-starry-galaxy-majesty-generative-ai.jpg"
 
 
-//        Javalin app = Javalin.create().start(8080);
-//        new SpotController(
-//                app,
-//                SingletonFactory.getInstance(SpotService.class,
-//                        SingletonFactory.getInstance(TopicProvider.class))
-//        );
+        Javalin app = Javalin.create().start(8080);
+        SpotController spotController = SingletonFactory.getInstance(SpotController.class);
 
-        B b = SingletonFactory.getInstance(B.class);
-        b.sout();
     }
 }

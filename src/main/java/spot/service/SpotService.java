@@ -1,7 +1,7 @@
 package spot.service;
 
 import core.clients.provider.TopicProvider;
-import infrastructure.factory.Singleton;
+import infrastructure.singleton.Singleton;
 
 @Singleton
 public class SpotService {
