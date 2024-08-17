@@ -4,12 +4,11 @@ public class SingletonFactory {
 
     @SuppressWarnings("unchecked")
     public static <T> T getInstance(Class<T> clazz) {
-        SingletonKey key = new SingletonKey(clazz, null);
         if (SingletonContainer.containsKey(clazz)) {
             return (T) SingletonContainer.get(clazz);
         }
 
-        // 인스턴스가 없으면 등록
+        // 인스턴스가 컨테이너에 없으면 등록
         SingletonRegistry.registerSingleton(clazz, InjectionStrategy.AUTO_INJECTED);
 
         // 등록된 인스턴스를 반환

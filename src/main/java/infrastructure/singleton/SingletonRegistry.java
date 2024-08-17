@@ -14,18 +14,22 @@ public class SingletonRegistry {
      * 이미 등록되어 있는 객체를 등록하려 하는 경우, 아무 동작도 하지 않는다.
      *
      * @param clazz   클래스 타입
-     * @param strategy
+     * @param strategy 컨테이너에 등록되는 방식에 대한 전략
      * @throws IllegalStateException    이미 등록되어 있는 클래스를 재등록하려는 경우
      * @throws IllegalStateException    등록하려는 클래스에 {@link Singleton}어노테이션이 없는 경우
      * @throws IllegalArgumentException 등록하려는 클래스에 {@link Injection }어노테이션 또는 '기본 생성자'가 없는 경우
      */
     @SuppressWarnings("unchecked")
-    protected static <T> void registerSingleton(Class<T> clazz, InjectionStrategy strategy) {
+    protected static <T> void registerSingleton(
+            Class<T> clazz,
+            InjectionStrategy strategy
+    ) {
         SingletonKey newKey = new SingletonKey(clazz, strategy);
         SingletonKey existingKey = SingletonContainer.findExistingKey(clazz);
 
         if (existingKey != null) {
-            if (existingKey.injectionStrategy == InjectionStrategy.MANUAL_INJECTED) {
+            // 명시적 등록에 의한 충돌 발생시에
+            if (isManualRegistrationConflict(strategy, existingKey.injectionStrategy)) {
                 throw new IllegalStateException("Is already registered as a singleton. Class: " + clazz.getName());
             }
             return;
@@ -34,7 +38,7 @@ public class SingletonRegistry {
         synchronized (clazz) { // 멀티스레드시 동기화 처리
             existingKey = SingletonContainer.findExistingKey(clazz);
             if (existingKey != null) {
-                if (existingKey.injectionStrategy == InjectionStrategy.MANUAL_INJECTED) {
+                if (isManualRegistrationConflict(strategy, existingKey.injectionStrategy)) {
                     throw new IllegalStateException("Is already registered as a singleton. Class: " + clazz.getName());
                 }
                 return;
@@ -77,7 +81,10 @@ public class SingletonRegistry {
      * @param instance 해당 클래스 타입의 인스턴스
      * @throws IllegalStateException 이미 등록되어 있는 클래스를 재등록하려는 경우
      */
-    public static <T> void registerInstanceAsSingleton(Class<T> clazz, T instance) {
+    public static <T> void registerInstanceAsSingleton(
+            Class<T> clazz,
+            T instance
+    ) {
         SingletonKey key = new SingletonKey(clazz, InjectionStrategy.MANUAL_INJECTED);
         if (SingletonContainer.containsKey(clazz)) {
             throw new IllegalStateException("Is already registered as a singleton. Class: " + clazz.getName());
@@ -115,4 +122,13 @@ public class SingletonRegistry {
         }
         return parameters;
     }
+
+    private static boolean isManualRegistrationConflict(
+            InjectionStrategy newStrategy,
+            InjectionStrategy existingStrategy
+    ) {
+        return newStrategy == InjectionStrategy.MANUAL_INJECTED
+                || existingStrategy == InjectionStrategy.MANUAL_INJECTED;
+    }
+
 }
