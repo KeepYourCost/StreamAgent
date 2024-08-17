@@ -1,4 +1,4 @@
-package util;
+package core.util;
 
 public class AmbleManager {
     private static final byte PREAMBLE_PATTERN = (byte) 0xAA; // 10101010

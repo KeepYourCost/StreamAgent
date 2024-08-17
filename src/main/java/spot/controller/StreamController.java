@@ -1,10 +1,9 @@
-package controller;
+package spot.controller;
 
-import clients.consumer.FileDataConsumer;
-import clients.consumer.FileInfo;
-import clients.producer.DataProducer;
-import util.FileBuffer;
-import util.FileCombiner;
+import core.clients.consumer.FileDataConsumer;
+import core.clients.consumer.FileInfo;
+import core.clients.producer.DataProducer;
+import core.util.FileCombiner;
 
 import java.util.IllegalFormatFlagsException;
 

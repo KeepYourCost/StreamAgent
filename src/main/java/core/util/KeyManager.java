@@ -1,4 +1,4 @@
-package util;
+package core.util;
 
 public class KeyManager {
     private static final String KEY_DELIMITER = "::";

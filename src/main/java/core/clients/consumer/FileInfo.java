@@ -1,6 +1,6 @@
-package clients.consumer;
+package core.clients.consumer;
 
-import util.FileBuffer;
+import core.util.FileBuffer;
 
 public record FileInfo(
         String filePath,

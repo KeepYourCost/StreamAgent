@@ -1,4 +1,4 @@
-package clients.producer;
+package core.clients.producer;
 
 import config.KafkaConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -6,9 +6,9 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.AmbleManager;
-import util.FileSplitter;
-import util.KeyManager;
+import core.util.AmbleManager;
+import core.util.FileSplitter;
+import core.util.KeyManager;
 
 import java.io.IOException;
 import java.util.List;

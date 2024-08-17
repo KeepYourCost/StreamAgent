@@ -1,5 +1,7 @@
 package util;
 
+import core.util.FileBuffer;
+import core.util.FileSplitter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
