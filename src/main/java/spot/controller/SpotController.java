@@ -1,6 +1,7 @@
 package spot.controller;
 
 import common.vo.Message;
+import infrastructure.singleton.Injection;
 import infrastructure.singleton.Singleton;
 import io.javalin.Javalin;
 import spot.controller.vo.ReqRegisterSpotId;
@@ -11,6 +12,7 @@ public class SpotController {
     private final Javalin app;
     private final SpotService spotService;
 
+    @Injection
     public SpotController(
             Javalin app,
             SpotService spotService

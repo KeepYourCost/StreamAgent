@@ -4,6 +4,9 @@ import infrastructure.singleton.Singleton;
 
 @Singleton
 public class TopicProvider {
+    public TopicProvider() {
+    }
+
     private String produceTopic = null;
     private String consumeTopic = null;
 

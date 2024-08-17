@@ -1,12 +1,14 @@
 package spot.service;
 
 import core.clients.provider.TopicProvider;
+import infrastructure.singleton.Injection;
 import infrastructure.singleton.Singleton;
 
 @Singleton
 public class SpotService {
     private final TopicProvider topicProvider;
 
+    @Injection
     public SpotService (
             TopicProvider topicProvider
     ) {

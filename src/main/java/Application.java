@@ -20,12 +20,15 @@ public class Application {
 //"D:\\StreamAgent\\src\\main\\resources\\sample\\snowy-mountain-peak-starry-galaxy-majesty-generative-ai.jpg"
 
 
-        SingletonScanner.scanSingletonsFromRoot();
-
         Javalin app = Javalin.create().start(8080);
         SingletonScanner.registerInstanceAsSingleton(Javalin.class, app);
 
-        SpotController spotController = SingletonFactory.getInstance(SpotController.class);
+        SingletonScanner.scanSingletonsFromRoot();
 
+
+//        SpotController spotController = SingletonFactory.getInstance(SpotController.class);
+
+        B b = SingletonFactory.getInstance(B.class);
+        b.sout();
     }
 }
