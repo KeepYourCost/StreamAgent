@@ -37,6 +37,7 @@ dependencies {
     // 경량 HTTP 라이브러리 (Netty 기반)
     // https://mvnrepository.com/artifact/io.javalin/javalin
     implementation 'io.javalin:javalin:6.1.3'
+    implementation 'org.json:json:20231013'
 
 
     testImplementation platform('org.junit:junit-bom:5.9.1')

@@ -19,4 +19,8 @@ public class SpotService {
         topicProvider.registerProduceTopic(currSpotId);
         topicProvider.registerConsumeTopic(prevSpotId);
     }
+
+    public String fetchCurrentSpotId() {
+
+    }
 }
