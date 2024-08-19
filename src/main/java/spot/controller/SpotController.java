@@ -1,6 +1,7 @@
 package spot.controller;
 
 import common.vo.Message;
+import core.clients.provider.TopicProvider;
 import infrastructure.singleton.Injection;
 import infrastructure.singleton.Singleton;
 import io.javalin.Javalin;
@@ -21,7 +22,7 @@ public class SpotController {
         this.spotService = spotService;
     }
 
-    public void registerSpotId () {
+    public void handleRegisterSpotIdRequest() {
         app.post("/spot-id", ctx -> {
             ReqRegisterSpotId req = ctx.bodyAsClass(ReqRegisterSpotId.class);
 
@@ -32,5 +33,12 @@ public class SpotController {
             ctx.status(message.statusCode());
             ctx.json(message);
         });
+    }
+
+    public void registerSpotId() {
+        String currSpotId = spotService.fetchCurrSpotId();
+        String prevSpotId = spotService.fetchPrevSpotId(currSpotId);
+
+        spotService.registerTopic(currSpotId, prevSpotId);
     }
 }

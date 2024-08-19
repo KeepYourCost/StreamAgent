@@ -1,6 +1,7 @@
 package spot.service;
 
 import core.clients.provider.TopicProvider;
+import infrastructure.http.Fetcher;
 import infrastructure.singleton.Injection;
 import infrastructure.singleton.Singleton;
 
@@ -20,7 +21,15 @@ public class SpotService {
         topicProvider.registerConsumeTopic(prevSpotId);
     }
 
-    public String fetchCurrentSpotId() {
+    public String fetchCurrSpotId() {
+        Fetcher.Respone respone = Fetcher.method("GET").path("/spot/current").mime("JSON").send();
 
+        return respone.data().get("spotId").toString();
+    }
+
+    public String fetchPrevSpotId(String currId) {
+        Fetcher.Respone respone = Fetcher.method("GET").path("/spot/prev/"+currId).mime("JSON").send();
+
+        return respone.data().get("spotId").toString();
     }
 }

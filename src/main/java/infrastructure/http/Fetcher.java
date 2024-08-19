@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -97,45 +98,64 @@ public class Fetcher {
         return this;
     }
 
-    public String send() throws Exception {
+    public Respone send() {
         if (this.url == null) {
             throw new IllegalStateException("Not setup URL");
         }
-        HttpURLConnection connection = (HttpURLConnection) this.url.openConnection();
-        connection.setRequestMethod(this.method.name());
 
-        for (Map.Entry<String, String> entry : this.headers.entrySet()) {
-            connection.setRequestProperty(entry.getKey(), entry.getValue());
-        }
+        try {
+            HttpURLConnection connection = (HttpURLConnection) this.url.openConnection();
+            connection.setRequestMethod(this.method.name());
 
-        if (this.mimeType != null) {
-            connection.setRequestProperty("Content-Type", this.mimeType.getContentType());
-        }
+            for (Map.Entry<String, String> entry : this.headers.entrySet()) {
+                connection.setRequestProperty(entry.getKey(), entry.getValue());
+            }
 
-        if (this.method == HttpMethod.POST || this.method == HttpMethod.PATCH || this.method == HttpMethod.PUT) {
-            connection.setDoOutput(true);
-            if (this.data != null) {
-                try (OutputStream os = connection.getOutputStream()) {
-                    byte[] input = this.data.getBytes(StandardCharsets.UTF_8);
-                    os.write(input, 0, input.length);
+            if (this.mimeType != null) {
+                connection.setRequestProperty("Content-Type", this.mimeType.getContentType());
+            }
+
+            if (this.method == HttpMethod.POST || this.method == HttpMethod.PATCH || this.method == HttpMethod.PUT) {
+                connection.setDoOutput(true);
+                if (this.data != null) {
+                    try (OutputStream os = connection.getOutputStream()) {
+                        byte[] input = this.data.getBytes(StandardCharsets.UTF_8);
+                        os.write(input, 0, input.length);
+                    }
                 }
             }
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String contentType = connection.getHeaderField("Content-Type");
+                if (contentType != null && contentType.contains("application/json")) {
+                    return new Respone(responseCode, Parser.parseJsonResponse(connection));
+                }
+
+                return new Respone(
+                        responseCode,
+                        (Map<String, Object>) new HashMap<>().put(
+                                "text",
+                                new String(connection.getInputStream().readAllBytes(), StandardCharsets.UTF_8))
+                );
+            }
+            return new Respone(responseCode, null);
+        } catch (IOException ex) {
+            throw new IllegalStateException("Failed to http request");
         }
 
-        int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            String contentType = connection.getHeaderField("Content-Type");
-            if (contentType != null && contentType.contains("application/json")) {
-                return parseJsonResponse(connection);
-            } else {
-                return new String(connection.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-            }
-        } else {
-            return "Error: " + responseCode;
-        }
     }
 
-    private Map<String, Object> parseJsonResponse(HttpURLConnection connection) throws Exception {
+    public record Respone(
+            int responseCode,
+            Map<String, Object> data
+    ) {
+
+    }
+}
+
+class Parser {
+    public static Map<String, Object> parseJsonResponse(HttpURLConnection connection) throws IOException {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
             StringBuilder response = new StringBuilder();
             String inputLine;
@@ -147,9 +167,8 @@ public class Fetcher {
         }
     }
 
-    private Map<String, Object> jsonToMap(JSONObject json) {
+    private static Map<String, Object> jsonToMap(JSONObject json) {
         Map<String, Object> map = new HashMap<>();
-
         for (String key : json.keySet()) {
             Object value = json.get(key);
             if (value instanceof JSONObject) {
@@ -160,25 +179,26 @@ public class Fetcher {
                 map.put(key, value);
             }
         }
-
         return map;
     }
 
-    private Object jsonArrayToList(JSONArray array) {
-        if (array.length() == 0) {
-            return new HashMap<>();
-        }
-        if (array.get(0) instanceof JSONObject) {
-            Map<Integer, Map<String, Object>> list = new HashMap<>();
-            for (int i = 0; i < array.length(); i++) {
-                list.put(i, jsonToMap(array.getJSONObject(i)));
+    private static Object jsonArrayToList(JSONArray array) {
+        java.util.List<Object> list = new java.util.ArrayList<>();
+        for (int i = 0; i < array.length(); i++) {
+            Object element = array.get(i);
+            if (element instanceof JSONObject) {
+                list.add(jsonToMap((JSONObject) element));
+            } else if (element instanceof JSONArray) {
+                list.add(jsonArrayToList((JSONArray) element));
+            } else {
+                list.add(element);
             }
-            return list;
-        } else {
-            return array.toList(); // Primitive array
         }
+        return list;
     }
 }
+
+
 
 enum HttpMethod {
     POST,
