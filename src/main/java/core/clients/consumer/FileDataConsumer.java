@@ -1,27 +1,33 @@
 package core.clients.consumer;
 
 import config.KafkaConfig;
-import core.util.AmbleManager;
-import core.util.FileBuffer;
-import core.util.KeyManager;
-import core.util.KeyRecord;
+import core.util.*;
+import infrastructure.singleton.Injection;
+import infrastructure.singleton.Singleton;
 import org.apache.kafka.clients.consumer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 
+@Singleton
 public class FileDataConsumer {
+    private final FileCombiner fileCombiner;
     private static String PREVIOUS_SPOT_ID = "YTA0YjkwYWEzZDY0MTFlZj";
     //OGViZjY4ZmMzZDY0MTFlZm
     private static final long POLLING_DURATION = 100L; // Millis
     private static final Logger LOGGER = LoggerFactory.getLogger(FileDataConsumer.class);
 
-    public FileDataConsumer() {
+    @Injection
+    public FileDataConsumer(
+            FileCombiner fileCombiner
+    ) {
+        this.fileCombiner = fileCombiner;
     }
 
-    public FileInfo consumeFileDataStream() throws IllegalFormatFlagsException{
+    public FileInfo consumeFileDataStream() throws IllegalFormatFlagsException {
         FileBuffer buffer = new FileBuffer();
         String currentFilePath = "";
 
@@ -56,6 +62,7 @@ public class FileDataConsumer {
                     System.out.println(chunkIndex);
 
                     if (!currentFilePath.isEmpty() && !Objects.equals(filePath, currentFilePath)) {
+                        fileCombiner.writeFile(currentFilePath, buffer);
                         LOGGER.info("WRITE FILE path: {}", currentFilePath);
                         buffer.clearChunks();
                     }
@@ -64,6 +71,8 @@ public class FileDataConsumer {
                     currentFilePath = filePath;
                 }
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

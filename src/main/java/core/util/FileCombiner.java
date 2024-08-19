@@ -1,24 +1,17 @@
 package core.util;
 
+import infrastructure.singleton.Injection;
+import infrastructure.singleton.Singleton;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+@Singleton
 public class FileCombiner {
     public static final int CHUNK_SIZE = 1024;
-    private static volatile FileCombiner instance;
 
+    @Injection
     private FileCombiner() {
-    }
-
-    public static FileCombiner getInstance() {
-        if (instance == null) {
-            synchronized (FileCombiner.class) {
-                if (instance == null) {
-                    instance = new FileCombiner();
-                }
-            }
-        }
-        return instance;
     }
 
     public void writeFile(String filePath, FileBuffer fileBuffer) throws IOException {
