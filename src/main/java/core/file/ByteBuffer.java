@@ -1,22 +1,22 @@
-package core.util;
+package core.file;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class FileBuffer {
+public class ByteBuffer {
     private final List<byte[]> chunks;
 
-    public FileBuffer() {
+    public ByteBuffer() {
         this.chunks = new ArrayList<>();
     }
 
-    public FileBuffer(List<byte[]> chunks) {
+    public ByteBuffer(List<byte[]> chunks) {
         this.chunks = new ArrayList<>(chunks);
     }
 
-    public FileBuffer(byte[] chunks) {
+    public ByteBuffer(byte[] chunks) {
         this.chunks = new ArrayList<>(Collections.singleton(chunks));
     }
 
@@ -64,7 +64,7 @@ public class FileBuffer {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FileBuffer that = (FileBuffer) o;
+        ByteBuffer that = (ByteBuffer) o;
         return Objects.equals(chunks, that.chunks);
     }
 

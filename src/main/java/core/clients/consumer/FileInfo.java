@@ -1,12 +1,12 @@
 package core.clients.consumer;
 
-import core.util.FileBuffer;
+import core.file.ByteBuffer;
 
 public record FileInfo(
         String filePath,
-        FileBuffer fileBuffer
+        ByteBuffer byteBuffer
 ) {
-    public static FileInfo of(String filePath, FileBuffer fileBuffer) {
-        return new FileInfo(filePath, fileBuffer);
+    public static FileInfo of(String filePath, ByteBuffer byteBuffer) {
+        return new FileInfo(filePath, byteBuffer);
     }
 }

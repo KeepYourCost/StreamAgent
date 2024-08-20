@@ -3,7 +3,7 @@ package spot.controller;
 import core.clients.consumer.FileDataConsumer;
 import core.clients.consumer.FileInfo;
 import core.clients.producer.FileDataProducer;
-import core.util.FileCombiner;
+import core.file.FileCombiner;
 
 import java.util.IllegalFormatFlagsException;
 

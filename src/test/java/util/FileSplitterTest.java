@@ -1,7 +1,7 @@
 package util;
 
-import core.util.FileBuffer;
-import core.util.FileSplitter;
+import core.file.ByteBuffer;
+import core.file.FileSplitter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class FileSplitterTest {
-    final FileSplitter fileSplitter = FileSplitter.getInstance();
+    final FileSplitter fileSplitter = new FileSplitter();
 
     @Test
     @DisplayName("파일분할_텍스트")
@@ -28,12 +28,12 @@ class FileSplitterTest {
         int expectedChunkCount = (fileContent.length + FileSplitter.CHUNK_SIZE - 1) / FileSplitter.CHUNK_SIZE;
 
         // When
-        FileBuffer fileBuffer = fileSplitter.splitFile(path.toString());
+        ByteBuffer byteBuffer = fileSplitter.split(path.toString());
 
         // Then
         // 분할된 Chunk 개수로 비교
-        assertNotNull(fileBuffer.getChunks());
-        assertEquals(expectedChunkCount, fileBuffer.getChunkCount());
+        assertNotNull(byteBuffer.getChunks());
+        assertEquals(expectedChunkCount, byteBuffer.getChunkCount());
     }
 
     @Test
@@ -47,11 +47,11 @@ class FileSplitterTest {
         int expectedChunkCount = (fileContent.length + FileSplitter.CHUNK_SIZE - 1) / FileSplitter.CHUNK_SIZE;
 
         // When
-        FileBuffer fileBuffer = fileSplitter.splitFile(path.toString());
+        ByteBuffer byteBuffer = fileSplitter.split(path.toString());
 
         // Then
-        assertNotNull(fileBuffer.getChunks());
-        assertEquals(expectedChunkCount, fileBuffer.getChunkCount());
+        assertNotNull(byteBuffer.getChunks());
+        assertEquals(expectedChunkCount, byteBuffer.getChunkCount());
     }
 
     @Test
@@ -65,10 +65,10 @@ class FileSplitterTest {
         int expectedChunkCount = (fileContent.length + FileSplitter.CHUNK_SIZE - 1) / FileSplitter.CHUNK_SIZE;
 
         // When
-        FileBuffer fileBuffer = fileSplitter.splitFile(path.toString());
+        ByteBuffer byteBuffer = fileSplitter.split(path.toString());
 
         // Then
-        assertNotNull(fileBuffer.getChunks());
-        assertEquals(expectedChunkCount, fileBuffer.getChunkCount());
+        assertNotNull(byteBuffer.getChunks());
+        assertEquals(expectedChunkCount, byteBuffer.getChunkCount());
     }
 }

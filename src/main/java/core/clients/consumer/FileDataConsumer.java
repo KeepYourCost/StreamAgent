@@ -1,6 +1,8 @@
 package core.clients.consumer;
 
 import config.KafkaConfig;
+import core.file.ByteBuffer;
+import core.file.FileCombiner;
 import core.util.*;
 import infrastructure.singleton.Injection;
 import infrastructure.singleton.Singleton;
@@ -28,7 +30,7 @@ public class FileDataConsumer {
     }
 
     public FileInfo consumeFileDataStream() throws IllegalFormatFlagsException {
-        FileBuffer buffer = new FileBuffer();
+        ByteBuffer buffer = new ByteBuffer();
         String currentFilePath = "";
 
         try (final Consumer<String, byte[]> consumer = new KafkaConsumer<>(KafkaConfig.getConsumerProperties())) {

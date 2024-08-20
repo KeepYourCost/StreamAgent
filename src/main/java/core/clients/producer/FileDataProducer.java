@@ -9,7 +9,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import core.util.AmbleManager;
-import core.util.FileSplitter;
+import core.file.FileSplitter;
 import core.util.KeyManager;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class FileDataProducer {
 
     private void produce(String src, String dest) throws IOException {
         LOGGER.info("데이터 전송 준비");
-        List<byte[]> dataStreams = fileSplitter.splitFile(src).getChunks();
+        List<byte[]> dataStreams = fileSplitter.split(src).getChunks();
         LOGGER.info("데이터 분할 완료. Path = {}", src);
 
         try (final Producer<String, byte[]> producer = new KafkaProducer<>(KafkaConfig.getProducerProperties())) {

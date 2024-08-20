@@ -1,6 +1,6 @@
 package util;
 
-import core.util.FileCombiner;
+import core.file.FileCombiner;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -26,13 +26,4 @@ class FileCombinerTest {
 //        // Cleanup
 //        Files.delete(Paths.get(filePath));
 //    }
-
-    @Test
-    @DisplayName("싱글톤 인스턴스 테스트")
-    void testSingletonInstance() {
-        FileCombiner instance1 = FileCombiner.getInstance();
-        FileCombiner instance2 = FileCombiner.getInstance();
-
-        assertSame(instance1, instance2);
-    }
 }
