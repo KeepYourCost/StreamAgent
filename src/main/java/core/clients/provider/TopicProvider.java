@@ -1,14 +1,11 @@
 package core.clients.provider;
 
-import infrastructure.singleton.Singleton;
-
-@Singleton
 public class TopicProvider {
     public TopicProvider() {
     }
 
-    private String produceTopic = null;
-    private String consumeTopic = null;
+    private static String produceTopic = null;
+    private static String consumeTopic = null;
 
     public void registerProduceTopic(String produceTopic) {
         this.produceTopic = produceTopic;
@@ -18,14 +15,14 @@ public class TopicProvider {
         this.consumeTopic = consumeTopic;
     }
 
-    public String getProduceTopic() {
+    public static String getProduceTopic() throws IllegalCallerException{
         if (produceTopic == null) {
             throw new IllegalCallerException("Produce Topic이 등록되지 않음");
         }
         return produceTopic;
     }
 
-    public String getConsumeTopic() {
+    public static String getConsumeTopic() throws IllegalCallerException {
         if (consumeTopic == null) {
             throw new IllegalCallerException("Consume Topic이 등록되지 않음");
         }

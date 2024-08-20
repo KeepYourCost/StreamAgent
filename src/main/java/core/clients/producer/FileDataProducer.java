@@ -1,6 +1,8 @@
 package core.clients.producer;
 
 import config.KafkaConfig;
+import core.clients.provider.TopicProvider;
+import core.file.FileReader;
 import infrastructure.singleton.Injection;
 import infrastructure.singleton.Singleton;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -17,96 +19,75 @@ import java.util.List;
 
 @Singleton
 public class FileDataProducer {
+    private final FileReader fileReader;
     private final FileSplitter fileSplitter;
-    private static String CURRENT_SPOT_ID = "YTA0YjkwYWEzZDY0MTFlZj";
     private static final Logger LOGGER = LoggerFactory.getLogger(FileDataProducer.class);
 
     @Injection
-    public FileDataProducer(FileSplitter fileSplitter) {
+    public FileDataProducer(
+            FileReader fileReader,
+            FileSplitter fileSplitter
+    ) {
+        this.fileReader = fileReader;
         this.fileSplitter = fileSplitter;
     }
 
     public void produceFileDataStream(String src) {
         try {
-            produce(src, src);
-        } catch (IOException ex) {
-            LOGGER.error("Failed to split data stream");
+            produceFile(src, src);
+        } catch (IOException | IllegalCallerException ex) {
+            LOGGER.error(ex.getMessage());
         }
     }
 
     public void produceFileDataStream(String src, String dest) {
         try {
-            produce(src, dest);
-        } catch (IOException ex) {
-            LOGGER.error("Failed to split data stream");
+            produceFile(src, dest);
+        } catch (IOException | IllegalCallerException ex) {
+            LOGGER.error(ex.getMessage());
         }
     }
 
-    private void produce(String src, String dest) throws IOException {
-        LOGGER.info("데이터 전송 준비");
-        List<byte[]> dataStreams = fileSplitter.split(src).getChunks();
-        LOGGER.info("데이터 분할 완료. Path = {}", src);
+    private void produceFile(String srcPath, String destPath) throws IOException, IllegalCallerException {
+        // File 읽기
+        byte[] fileStream = fileReader.read(srcPath);
+        List<byte[]> dataStreams = fileSplitter.split(fileStream).getChunks();
+        LOGGER.info("Successfully read the file. Source Path = {}", srcPath);
 
+        // Topic 가져오기
+        final String topic = TopicProvider.getProduceTopic();
+
+        // File 전송하기
         try (final Producer<String, byte[]> producer = new KafkaProducer<>(KafkaConfig.getProducerProperties())) {
-            // 프리앰블 전송
-            sendPreamble(producer);
+            ProducerRecord preRecord = new ProducerRecord(topic, "PREAMBLE", AmbleManager.generatePreamble());
+            sendMessage(producer, preRecord);
 
+            // 직렬 produce 방식
+            // 성능 개선이 필요할 경우 Stream API와 parallel 도입 가능
             for (int i = 0; i < dataStreams.size(); i++) {
-                final String key = KeyManager.generateKey(dest, i);
-                producer.send(
-                        new ProducerRecord<>(
-                                CURRENT_SPOT_ID,
-                                key,
-                                dataStreams.get(i)),
-                        (event, ex) -> {
-                            if (ex != null) {
-                                ex.printStackTrace();
-                                LOGGER.error(ex.getMessage());
-                            }
-                            else {
-                                LOGGER.info("Produced event to topic '{}': key = {}", CURRENT_SPOT_ID, key);
-                            }
-                        }
-                );
+                final String key = KeyManager.generateKey(destPath, i);
+                final byte[] value = dataStreams.get(i);
+                ProducerRecord record = new ProducerRecord(topic, key, value);
+
+                sendMessage(producer, record);
             }
 
-            // 포스트앰블 전송
-            sendPostamble(producer);
+            ProducerRecord postRecord = new ProducerRecord(topic, "POSTAMBLE", AmbleManager.generatePreamble());
+            sendMessage(producer, postRecord);
         }
-        LOGGER.info("데이터 전송 완료");
+
+        LOGGER.info("Successfully produced file data. File = {}", srcPath);
     }
 
-    private void sendPreamble(Producer<String, byte[]> producer) {
-        byte[] preamble = AmbleManager.generatePreamble();
+    private void sendMessage(Producer<String, byte[]> producer, ProducerRecord record) {
         producer.send(
-                new ProducerRecord<>(
-                        CURRENT_SPOT_ID,
-                        "PREAMBLE",
-                        preamble),
+                record,
                 (event, ex) -> {
                     if (ex != null) {
                         ex.printStackTrace();
-                    }
-                    else {
-                        LOGGER.info("Produced preamble to topic '{}'", CURRENT_SPOT_ID);
-                    }
-                }
-        );
-    }
-
-    private void sendPostamble(Producer<String, byte[]> producer) {
-        byte[] postamble = AmbleManager.generatePostamble();
-        producer.send(
-                new ProducerRecord<>(
-                        CURRENT_SPOT_ID,
-                        "DONE",
-                        postamble),
-                (event, ex) -> {
-                    if (ex != null) {
-                        ex.printStackTrace();
-                    }
-                    else {
-                        LOGGER.info("Produced postamble to topic '{}'", CURRENT_SPOT_ID);
+                        LOGGER.error(ex.getMessage());
+                    } else {
+                        LOGGER.info("Produced event to topic '{}': key = {}", record.topic(), record.key());
                     }
                 }
         );

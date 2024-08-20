@@ -17,7 +17,6 @@ import java.util.*;
 @Singleton
 public class FileDataConsumer {
     private final FileCombiner fileCombiner;
-    private static String PREVIOUS_SPOT_ID = "YTA0YjkwYWEzZDY0MTFlZj";
     //OGViZjY4ZmMzZDY0MTFlZm
     private static final long POLLING_DURATION = 100L; // Millis
     private static final Logger LOGGER = LoggerFactory.getLogger(FileDataConsumer.class);
@@ -64,7 +63,6 @@ public class FileDataConsumer {
                     System.out.println(chunkIndex);
 
                     if (!currentFilePath.isEmpty() && !Objects.equals(filePath, currentFilePath)) {
-                        fileCombiner.writeFile(currentFilePath, buffer);
                         LOGGER.info("WRITE FILE path: {}", currentFilePath);
                         buffer.clearChunks();
                     }
@@ -73,8 +71,6 @@ public class FileDataConsumer {
                     currentFilePath = filePath;
                 }
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }

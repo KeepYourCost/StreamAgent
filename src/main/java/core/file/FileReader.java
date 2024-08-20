@@ -17,11 +17,9 @@ public class FileReader {
         this.fileSplitter = fileSplitter;
     }
 
-    public ByteBuffer read(String srcPath) throws IOException {
+    public byte[] read(String srcPath) throws IOException {
         srcPath = FilePathConverter.convertSafetyPath(srcPath);
         byte[] fileStream = Files.readAllBytes(Paths.get(srcPath));
-
-        ByteBuffer byteBuffer = fileSplitter.split(fileStream);
-        return byteBuffer;
+        return fileStream;
     }
 }
