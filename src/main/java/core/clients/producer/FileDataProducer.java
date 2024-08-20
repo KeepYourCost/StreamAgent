@@ -21,15 +21,18 @@ import java.util.List;
 public class FileDataProducer {
     private final FileReader fileReader;
     private final FileSplitter fileSplitter;
+    private final TopicProvider topicProvider;
     private static final Logger LOGGER = LoggerFactory.getLogger(FileDataProducer.class);
 
     @Injection
     public FileDataProducer(
             FileReader fileReader,
-            FileSplitter fileSplitter
+            FileSplitter fileSplitter,
+            TopicProvider topicProvider
     ) {
         this.fileReader = fileReader;
         this.fileSplitter = fileSplitter;
+        this.topicProvider = topicProvider;
     }
 
     public void produceFileDataStream(String src) {
@@ -55,7 +58,7 @@ public class FileDataProducer {
         LOGGER.info("Successfully read the file. Source Path = {}", srcPath);
 
         // Topic 가져오기
-        final String topic = TopicProvider.getProduceTopic();
+        final String topic = topicProvider.getProduceTopic();
 
         // File 전송하기
         try (final Producer<String, byte[]> producer = new KafkaProducer<>(KafkaConfig.getProducerProperties())) {

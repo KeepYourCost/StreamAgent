@@ -1,5 +1,6 @@
 import core.clients.consumer.FileDataConsumer;
 import core.clients.producer.FileDataProducer;
+import core.clients.provider.TopicProvider;
 import infrastructure.singleton.SingletonRegistry;
 import infrastructure.singleton.SingletonFactory;
 import infrastructure.singleton.SingletonScanner;
@@ -11,6 +12,11 @@ public class Application {
         SingletonRegistry.registerInstanceAsSingleton(Javalin.class, app);
 
         SingletonScanner.scanSingletonsFromRoot();
+
+        TopicProvider topicProvider = SingletonFactory.getInstance(TopicProvider.class);
+        topicProvider.registerProduceTopic("TEST");
+        topicProvider.registerConsumeTopic("TEST");
+
 
         FileDataProducer producer = SingletonFactory.getInstance(FileDataProducer.class);
         producer.produceFileDataStream(

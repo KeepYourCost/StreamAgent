@@ -20,16 +20,19 @@ import java.util.*;
 public class FileDataConsumer {
     private final FileWriter fileWriter;
     private final FileCombiner fileCombiner;
+    private final TopicProvider topicProvider;
     private static final long POLLING_DURATION = 100L; // Millis
     private static final Logger LOGGER = LoggerFactory.getLogger(FileDataConsumer.class);
 
     @Injection
     public FileDataConsumer(
             FileWriter fileWriter,
-            FileCombiner fileCombiner
+            FileCombiner fileCombiner,
+            TopicProvider topicProvider
     ) {
         this.fileWriter = fileWriter;
         this.fileCombiner = fileCombiner;
+        this.topicProvider = topicProvider;
     }
 
     public void consumeFile() throws IllegalFormatFlagsException {
@@ -38,7 +41,7 @@ public class FileDataConsumer {
 
         try (final Consumer<String, byte[]> consumer = createConsumer()) {
             // Topic 가져오기
-            final String topic = TopicProvider.getConsumeTopic();
+            final String topic = topicProvider.getConsumeTopic();
             consumer.subscribe(Arrays.asList(topic));
             setTopicPartitionZero(consumer);
 
