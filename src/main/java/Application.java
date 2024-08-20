@@ -8,7 +8,7 @@ import io.javalin.Javalin;
 
 public class Application {
     public static void main(String[] args) {
-        Javalin app = Javalin.create().start(8080);
+        Javalin app = Javalin.create().start(5000);
         SingletonRegistry.registerInstanceAsSingleton(Javalin.class, app);
 
         SingletonScanner.scanSingletonsFromRoot();

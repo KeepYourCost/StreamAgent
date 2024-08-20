@@ -75,7 +75,7 @@ public class FileDataProducer {
                 sendMessage(producer, record);
             }
 
-            ProducerRecord postRecord = new ProducerRecord(topic, "POSTAMBLE", AmbleManager.generatePreamble());
+            ProducerRecord postRecord = new ProducerRecord(topic, "DONE", AmbleManager.generatePostamble());
             sendMessage(producer, postRecord);
         }
 
@@ -90,7 +90,7 @@ public class FileDataProducer {
                         ex.printStackTrace();
                         LOGGER.error(ex.getMessage());
                     } else {
-                        LOGGER.info("Produced event to topic '{}': key = {}", record.topic(), record.key());
+                        LOGGER.debug("Produced event to topic '{}': key = {}", record.topic(), record.key());
                     }
                 }
         );

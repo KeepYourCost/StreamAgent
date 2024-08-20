@@ -55,6 +55,7 @@ public class FileDataConsumer {
                     }
 
                     if (isDone(record, currentFilePath)) {
+                        writeIfNecessary(buffer, currentFilePath, null);
                         return;
                     }
 
@@ -97,7 +98,7 @@ public class FileDataConsumer {
      */
     private boolean isPreamble(ConsumerRecord<String, byte[]> record) {
         if (record.key().equals("PREAMBLE") && AmbleManager.isPreamble(record.value())) {
-            LOGGER.info("START");
+            LOGGER.info("IS START");
             return true;
         }
         return false;
@@ -111,7 +112,7 @@ public class FileDataConsumer {
      */
     private boolean isDone(ConsumerRecord<String, byte[]> record, String currentFilePath) {
         if (record.key().equals("DONE") && AmbleManager.isPostamble(record.value()) && !currentFilePath.isEmpty()) {
-            LOGGER.info("DONE");
+            LOGGER.info("IS DONE");
             return true;
         }
         return false;
@@ -129,6 +130,7 @@ public class FileDataConsumer {
         if (!currentFilePath.isEmpty() && !Objects.equals(newFilePath, currentFilePath)) {
             byte[] bytes = fileCombiner.combine(buffer);
             fileWriter.write(currentFilePath, bytes);
+            LOGGER.info("Successfully write file. dest path: {}", currentFilePath);
             buffer.clearChunks();
         }
         return newFilePath;
