@@ -1,3 +1,5 @@
+import core.clients.consumer.FileDataConsumer;
+import core.clients.producer.FileDataProducer;
 import infrastructure.singleton.SingletonRegistry;
 import infrastructure.singleton.SingletonFactory;
 import infrastructure.singleton.SingletonScanner;
@@ -10,27 +12,16 @@ public class Application {
 
         SingletonScanner.scanSingletonsFromRoot();
 
+        FileDataProducer producer = SingletonFactory.getInstance(FileDataProducer.class);
+        producer.produceFileDataStream(
+                "D:\\StreamAgent\\src\\main\\resources\\sample\\src\\snowy-mountain-peak-starry-galaxy-majesty-generative-ai.jpg",
+                "D:\\StreamAgent\\src\\main\\resources\\sample\\dest\\snowy-mountain-peak-starry-galaxy-majesty-generative-ai.jpg"
+        );
 
-//        FileDataProducer fileDataProducer = new FileDataProducer(
-//                FileSplitter.getInstance()
-//        );
-//        FileDataConsumer consumer = new FileDataConsumer();
-//
-//        consumer.consumeFileDataStream();
-//        try {
-//            String filePath = "D:\\StreamAgent\\src\\main\\resources\\sample\\SampleImg.png";
-//            dataProducer.produceFileDataStream(filePath);
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//        }
-//"D:\\StreamAgent\\src\\main\\resources\\sample\\snowy-mountain-peak-starry-galaxy-majesty-generative-ai.jpg"
+        System.out.println("produce 완료");
 
+        FileDataConsumer consumer = SingletonFactory.getInstance(FileDataConsumer.class);
+        consumer.consumeFileDataStream();
 
-
-
-//        SpotController spotController = SingletonFactory.getInstance(SpotController.class);
-
-        B b = SingletonFactory.getInstance(B.class);
-        b.sout();
     }
 }
