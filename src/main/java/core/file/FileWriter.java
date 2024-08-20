@@ -9,22 +9,18 @@ import java.io.IOException;
 
 @Singleton
 public class FileWriter {
-    private final FileCombiner fileCombiner;
     @Injection
     public FileWriter(
-        FileCombiner fileCombiner
     ) {
-        this.fileCombiner = fileCombiner;
     }
 
-    public void write(String destPath, ByteBuffer byteBuffer) throws IOException {
+    public void write(String destPath, byte[] bytes) throws IOException {
         destPath = FilePathConverter.convertSafetyPath(destPath);
 
         makeParentDir(destPath);
 
-        byte[] combined = fileCombiner.combine(byteBuffer);
         try (FileOutputStream fos = new FileOutputStream(destPath)) {
-            fos.write(combined);
+            fos.write(bytes);
         }
     }
 

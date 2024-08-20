@@ -21,7 +21,7 @@ public class Application {
         System.out.println("produce 완료");
 
         FileDataConsumer consumer = SingletonFactory.getInstance(FileDataConsumer.class);
-        consumer.consumeFileDataStream();
+        consumer.consumeFile();
 
     }
 }
