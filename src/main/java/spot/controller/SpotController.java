@@ -41,4 +41,30 @@ public class SpotController {
 
         spotService.registerTopic(currSpotId, prevSpotId);
     }
+
+
+    public void handlerRecoverData() {
+        app.post("/read/:prevId", ctx -> {
+            String prevId = ctx.pathParam("prevId");
+            spotService.registerConsumeTopic(prevId);
+
+            Message message = Message.of(200, "OK");
+
+
+            ctx.status(message.statusCode());
+            ctx.json(message);
+        });
+    }
+
+    public void handlerBackupData() {
+        app.post("/write/:currId", ctx -> {
+            String currId = ctx.pathParam("currId");
+            spotService.registerProduceTopic(currId);
+
+            Message message = Message.of(200, "OK");
+
+            ctx.status(message.statusCode());
+            ctx.json(message);
+        });
+    }
 }

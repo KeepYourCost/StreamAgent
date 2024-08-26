@@ -20,6 +20,13 @@ public class SpotService {
         topicProvider.registerProduceTopic(currSpotId);
         topicProvider.registerConsumeTopic(prevSpotId);
     }
+    public void registerProduceTopic(String currSpotId) {
+        topicProvider.registerProduceTopic(currSpotId);
+    }
+
+    public void registerConsumeTopic(String prevSpotId) {
+        topicProvider.registerConsumeTopic(prevSpotId);
+    }
 
     public String fetchCurrSpotId() {
         Fetcher.Respone respone = Fetcher.method("GET").path("/spot/current").mime("JSON").send();
