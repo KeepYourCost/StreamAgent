@@ -1,5 +1,14 @@
 # KYC Stream Agent
 
+# require env
+java17 이상의 환경
+
+# Install
+다음 요청을 통해 실행 jar을 설치가능
+```shell
+curl -L -o kyc-agent-0.0.1.jar https://github.com/KeepYourCost/StreamAgent/releases/download/v0.0.1/kyc-agent-0.0.1.jar
+```
+
 # Manifest 설정
 
 환경변수로 `KYC_MANIFEST` 등록  
