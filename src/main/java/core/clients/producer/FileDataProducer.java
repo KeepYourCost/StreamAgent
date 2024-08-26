@@ -51,6 +51,24 @@ public class FileDataProducer {
         }
     }
 
+    public void sendStartSignal() {
+        final String topic = topicProvider.getProduceTopic();
+
+        try (final Producer<String, byte[]> producer = new KafkaProducer<>(KafkaConfig.getProducerProperties())) {
+            ProducerRecord preRecord = new ProducerRecord(topic, "PREAMBLE", AmbleManager.generatePreamble());
+            sendMessage(producer, preRecord);
+        }
+    }
+
+    public void sendEndSignal() {
+        final String topic = topicProvider.getProduceTopic();
+
+        try (final Producer<String, byte[]> producer = new KafkaProducer<>(KafkaConfig.getProducerProperties())) {
+            ProducerRecord postRecord = new ProducerRecord(topic, "DONE", AmbleManager.generatePostamble());
+            sendMessage(producer, postRecord);
+        }
+    }
+
     private void produceFile(String srcPath, String destPath) throws IOException, IllegalCallerException {
         // File 읽기
         byte[] fileStream = fileReader.read(srcPath);
@@ -62,9 +80,6 @@ public class FileDataProducer {
 
         // File 전송하기
         try (final Producer<String, byte[]> producer = new KafkaProducer<>(KafkaConfig.getProducerProperties())) {
-            ProducerRecord preRecord = new ProducerRecord(topic, "PREAMBLE", AmbleManager.generatePreamble());
-            sendMessage(producer, preRecord);
-
             // 직렬 produce 방식
             // 성능 개선이 필요할 경우 Stream API와 parallel 도입 가능
             for (int i = 0; i < dataStreams.size(); i++) {
@@ -74,9 +89,6 @@ public class FileDataProducer {
 
                 sendMessage(producer, record);
             }
-
-            ProducerRecord postRecord = new ProducerRecord(topic, "DONE", AmbleManager.generatePostamble());
-            sendMessage(producer, postRecord);
         }
 
         LOGGER.info("Successfully produced file data. File = {}", srcPath);
