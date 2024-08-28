@@ -1,9 +1,9 @@
 package infrastructure.http;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import config.AppConfig;
 import infrastructure.singleton.Singleton;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,6 +155,8 @@ public class Fetcher {
 }
 
 class Parser {
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     public static Map<String, Object> parseJsonResponse(HttpURLConnection connection) throws IOException {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
             StringBuilder response = new StringBuilder();
@@ -162,43 +164,10 @@ class Parser {
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);
             }
-            JSONObject json = new JSONObject(response.toString());
-            return jsonToMap(json);
+            return objectMapper.readValue(response.toString(), new TypeReference<Map<String, Object>>() {});
         }
-    }
-
-    private static Map<String, Object> jsonToMap(JSONObject json) {
-        Map<String, Object> map = new HashMap<>();
-        for (String key : json.keySet()) {
-            Object value = json.get(key);
-            if (value instanceof JSONObject) {
-                map.put(key, jsonToMap((JSONObject) value));
-            } else if (value instanceof JSONArray) {
-                map.put(key, jsonArrayToList((JSONArray) value));
-            } else {
-                map.put(key, value);
-            }
-        }
-        return map;
-    }
-
-    private static Object jsonArrayToList(JSONArray array) {
-        java.util.List<Object> list = new java.util.ArrayList<>();
-        for (int i = 0; i < array.length(); i++) {
-            Object element = array.get(i);
-            if (element instanceof JSONObject) {
-                list.add(jsonToMap((JSONObject) element));
-            } else if (element instanceof JSONArray) {
-                list.add(jsonArrayToList((JSONArray) element));
-            } else {
-                list.add(element);
-            }
-        }
-        return list;
     }
 }
-
-
 
 enum HttpMethod {
     POST,

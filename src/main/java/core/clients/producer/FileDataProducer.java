@@ -73,7 +73,7 @@ public class FileDataProducer {
         // File 읽기
         byte[] fileStream = fileReader.read(srcPath);
         List<byte[]> dataStreams = fileSplitter.split(fileStream).getChunks();
-        LOGGER.info("Successfully read the file. Source Path = {}", srcPath);
+//        LOGGER.info("Successfully read the file. Source Path = {}", srcPath);
 
         // Topic 가져오기
         final String topic = topicProvider.getProduceTopic();
@@ -91,7 +91,7 @@ public class FileDataProducer {
             }
         }
 
-        LOGGER.info("Successfully produced file data. File = {}", srcPath);
+//        LOGGER.info("Successfully produced file data. File = {}", srcPath);
     }
 
     private void sendMessage(Producer<String, byte[]> producer, ProducerRecord record) {

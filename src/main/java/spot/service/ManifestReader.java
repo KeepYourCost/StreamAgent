@@ -37,13 +37,20 @@ public class ManifestReader {
                     // 디렉토리인 경우, 해당 디렉토리의 모든 파일을 재귀적으로 읽기
                     List<TargetFile> filesInDir = readAllFilesFromDir(file);
                     allFiles.addAll(filesInDir);
-                } else {
-                    // 파일인 경우, 리스트에 추가
-                    allFiles.add(TargetFile.of(file.getAbsolutePath(), FileType.FILE));
+                    for (TargetFile f : filesInDir) {
+                        FileLogger.logTargetFile(f);
+                    }
+                    continue;
                 }
+
+                // 파일인 경우, 리스트에 추가
+                TargetFile targetFile = TargetFile.of(file.getAbsolutePath(), FileType.FILE);
+                allFiles.add(targetFile);
+                FileLogger.logTargetFile(targetFile);
             }
         }
 
+        System.out.printf("[ \u001B[32mTARGET FILES\u001B[0m, Path: \u001B[34m%s\u001B[0m ]%n", manifestFile.getAbsolutePath());
         return allFiles;
     }
 
@@ -52,15 +59,19 @@ public class ManifestReader {
         File[] entries = dir.listFiles();
         if (entries != null) {
             for (File entry : entries) {
-            if (!entry.isDirectory()) {
-                files.add(TargetFile.of(entry.getAbsolutePath(), FileType.FILE));
-                continue;
-            }
-            // 디렉토리인 경우, DIR 타입으로 리스트에 추가
-            files.add(TargetFile.of(entry.getAbsolutePath(), FileType.DIR));
-            // 하위 디렉토리와 파일들 재귀적으로 읽기
-            List<TargetFile> nestedFiles = readAllFilesFromDir(entry);
-            files.addAll(nestedFiles);
+                if (!entry.isDirectory()) {
+                    TargetFile targetFile = TargetFile.of(entry.getAbsolutePath(), FileType.FILE);
+                    files.add(targetFile);
+                    FileLogger.logTargetFile(targetFile);
+                    continue;
+                }
+                // 디렉토리인 경우, DIR 타입으로 리스트에 추가
+                TargetFile dirFile = TargetFile.of(entry.getAbsolutePath(), FileType.DIR);
+                files.add(dirFile);
+                FileLogger.logTargetFile(dirFile);
+                // 하위 디렉토리와 파일들 재귀적으로 읽기
+                List<TargetFile> nestedFiles = readAllFilesFromDir(entry);
+                files.addAll(nestedFiles);
             }
         }
         return files;

@@ -130,7 +130,7 @@ public class FileDataConsumer {
         if (!currentFilePath.isEmpty() && !Objects.equals(newFilePath, currentFilePath)) {
             byte[] bytes = fileCombiner.combine(buffer);
             fileWriter.write(currentFilePath, bytes);
-            LOGGER.info("Successfully write file. dest path: {}", currentFilePath);
+            LOGGER.debug("Successfully write file. dest path: {}", currentFilePath);
             buffer.clearChunks();
         }
         return newFilePath;

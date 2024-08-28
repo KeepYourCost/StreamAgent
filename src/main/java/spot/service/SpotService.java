@@ -49,7 +49,6 @@ public class SpotService {
 
     public List<TargetFile> readManifest() throws IOException {
         List<TargetFile> targetFiles = manifestReader.read();
-        System.out.println(targetFiles);
 
         return targetFiles;
     }

@@ -10,6 +10,7 @@ import io.javalin.Javalin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spot.controller.vo.ReqRegisterSpotId;
+import spot.service.FileLogger;
 import spot.service.ManifestReader;
 import spot.service.SpotService;
 import spot.service.vo.TargetFile;
@@ -106,23 +107,42 @@ public class SpotController {
     }
 
     public void exportData() {
+        int successCount = 0;
+        int failureCount = 0;
+
         try {
             List<TargetFile> targetFiles = manifestReader.read();
             producer.sendStartSignal();
+
+            int totalFiles = (int) targetFiles.stream()
+                    .filter(file -> file.type() != TargetFile.FileType.DIR)
+                    .count();
+            int processedFiles = 0;
 
             for (TargetFile targetFile : targetFiles) {
                 if (targetFile.type() == TargetFile.FileType.DIR) {
                     continue;
                 }
-                producer.produceFileDataStream(targetFile.path());
+                try {
+                    producer.produceFileDataStream(targetFile.path());
+                    successCount++;
+                } catch (Exception e) {
+                    failureCount++;
+                    LOGGER.error("Failed to process file: {}", targetFile.path(), e);
+                }
+
+                processedFiles++;
+                FileLogger.logProgress(processedFiles, totalFiles, targetFile.path());
             }
 
+            LOGGER.info("Backup data export completed. Total Files: {}, Success: {}, Failed: {}", totalFiles, successCount, failureCount);
             producer.sendEndSignal();
         } catch (IOException ex) {
             ex.printStackTrace();
             LOGGER.error(ex.getMessage());
         }
     }
+
 
     public void importData() {
         consumer.consumeFile();
